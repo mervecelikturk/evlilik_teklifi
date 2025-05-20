@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Benimle Evlenir Misin?</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #fdf6e3;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    position: relative;
+    height: 100vh;
+  }
+
+  h1 {
+    text-align: center;
+    margin-top: 100px;
+    color: #333;
+  }
+
+  #warningText {
+    text-align: center;
+    margin-top: 100px;
+    color: darkred;
+    display: none;
+  }
+
+  #warningText span {
+    font-size: 6rem;
+    font-weight: bold;
+    color: red;
+    user-select: none;
+  }
+
+  #buttons {
+    text-align: center;
+    margin-top: 40px;
+    position: relative;
+    height: 60px;
+  }
+
+  button {
+    font-size: 1.3rem;
+    padding: 12px 30px;
+    margin: 0 15px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    transition: left 0.3s ease, top 0.3s ease;
+    user-select: none;
+    background-color: #6b8e23; /* haki */
+    color: white;
+    font-weight: bold;
+  }
+
+  #yes {
+    left: calc(50% - 120px);
+  }
+
+  #no {
+    left: calc(50% + 20px);
+  }
+
+  #popup {
+    margin-top: 20px;
+    padding: 10px 15px;
+    background-color: #ffffcc;
+    border: 2px solid #cccc00;
+    display: none;
+    border-radius: 10px;
+    font-size: 1.2rem;
+    width: fit-content;
+    max-width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+
+  /* Kalpler için container arka planda */
+  #hearts-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .heart {
+    position: absolute;
+    color: #ff3366;
+    font-size: 30px;
+    animation: float 3s ease-out forwards;
+    opacity: 0.8;
+    user-select: none;
+    z-index: 0;
+  }
+
+  @keyframes float {
+    0% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-200px) scale(1.8);
+    }
+  }
+</style>
+</head>
+<body>
+
+<h1 id="question">Benimle evlenir misin?</h1>
+<h1 id="warningText" style="display:none;">
+  <span>❗</span><br>
+  Benden vaz mı geçiyorsun?
+</h1>
+
+<div id="buttons">
+  <button id="yes">Evet</button>
+  <button id="no">Hayır</button>
+</div>
+
+<div id="popup">Seni seviyorum 💖</div>
+<div id="hearts-container"></div>
+
+<script>
+  const yesBtn = document.getElementById('yes');
+  const noBtn = document.getElementById('no');
+  const popup = document.getElementById('popup');
+  const heartsContainer = document.getElementById('hearts-container');
+  const question = document.getElementById('question');
+  const warningText = document.getElementById('warningText');
+
+  let currentQuestion = "proposal"; // "proposal" veya "warning"
+
+  // Hayır butonunun sabit yeri (Benden vaz mı geçiyorsun ekranında)
+  const noBtnFixedPosition = {
+    left: "calc(50% + 20px)",
+    top: "0"
+  };
+
+  function createHeart() {
+    const heart = document.createElement('div');
+    heart.classList.add('heart');
+    heart.innerText = '❤️';
+
+    const x = Math.random() * window.innerWidth;
+    const y = Math.random() * window.innerHeight;
+
+    heart.style.left = `${x}px`;
+    heart.style.top = `${y}px`;
+    heart.style.fontSize = `${30 + Math.random() * 20}px`; // 30-50px arası
+
+    heartsContainer.appendChild(heart);
+
+    setTimeout(() => {
+      heart.remove();
+    }, 3000);
+  }
+
+  yesBtn.addEventListener('click', () => {
+    if (currentQuestion === "proposal") {
+      popup.style.display = 'block';
+      warningText.style.display = 'none';
+      question.style.display = 'block';
+
+      for (let i = 0; i < 10; i++) {
+        createHeart();
+      }
+
+    } else if (currentQuestion === "warning") {
+      // Evet butonu kaçıyor
+      const maxX = window.innerWidth - yesBtn.offsetWidth;
+      const maxY = window.innerHeight - yesBtn.offsetHeight;
+      const randomX = Math.floor(Math.random() * maxX);
+      const randomY = Math.floor(Math.random() * maxY);
+
+      yesBtn.style.left = randomX + 'px';
+      yesBtn.style.top = randomY + 'px';
+    }
+  });
+
+  noBtn.addEventListener('click', () => {
+    if (currentQuestion === "proposal") {
+      popup.style.display = 'none';
+      question.style.display = 'none';
+      warningText.style.display = 'block';
+      currentQuestion = "warning";
+
+      // Hayır butonunu sabit pozisyona al (yer değiştirmesin)
+      noBtn.style.left = noBtnFixedPosition.left;
+      noBtn.style.top = noBtnFixedPosition.top;
+
+    } else if (currentQuestion === "warning") {
+      warningText.style.display = 'none';
+      question.style.display = 'block';
+      popup.style.display = 'none';
+      currentQuestion = "proposal";
+
+      // Buton pozisyonlarını varsayılan yap
+      yesBtn.style.left = "calc(50% - 120px)";
+      yesBtn.style.top = "0";
+      noBtn.style.left = noBtnFixedPosition.left;
+      noBtn.style.top = noBtnFixedPosition.top;
+    }
+  });
+
+  // Evet butonunun başlangıç pozisyonları
+  yesBtn.style.left = "calc(50% - 120px)";
+  yesBtn.style.top = "0";
+
+  // Hayır butonunun başlangıç pozisyonları (buraya da sabitledik)
+  noBtn.style.left = noBtnFixedPosition.left;
+  noBtn.style.top = noBtnFixedPosition.top;
+</script>
+
+</body>
+</html>
